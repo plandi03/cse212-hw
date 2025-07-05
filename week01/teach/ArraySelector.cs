@@ -12,12 +12,13 @@ public static class ArraySelector
     private static int[] ListSelector(int[] list1, int[] list2, int[] select)
     {
         int[] result = new int[select.Length];
+        int idx1 = 0, idx2 = 0;
         for (int i = 0; i < select.Length; i++)
         {
             if (select[i] == 1)
-                result[i] = list1[i % list1.Length];
+                result[i] = list1[idx1++];
             else
-                result[i] = list2[i % list2.Length];
+                result[i] = list2[idx2++];
         }
         return result;
     }
