@@ -9,9 +9,7 @@
 /// </summary>
 public class TakingTurnsQueue
 {
-    private readonly PersonQueue _people = new();
-
-    public int Length => _people.Length;
+    private readonly Queue<(Person person, int turns)> _queue = new();
 
     /// <summary>
     /// Add new people to the queue with a name and number of turns
@@ -21,7 +19,7 @@ public class TakingTurnsQueue
     public void AddPerson(string name, int turns)
     {
         var person = new Person(name, turns);
-        _people.Enqueue(person);
+        _queue.Enqueue((person, turns));
     }
 
     /// <summary>
@@ -33,25 +31,27 @@ public class TakingTurnsQueue
     /// </summary>
     public Person GetNextPerson()
     {
-        if (_people.IsEmpty())
-        {
+        if (_queue.Count == 0)
             throw new InvalidOperationException("No one in the queue.");
-        }
-        else
+
+        var (person, turns) = _queue.Dequeue();
+
+        // Infinite turns
+        if (turns <= 0)
         {
-            Person person = _people.Dequeue();
-            if (person.Turns > 1)
-            {
-                person.Turns -= 1;
-                _people.Enqueue(person);
-            }
-
-            return person;
+            _queue.Enqueue((person, turns));
         }
+        // Finite turns
+        else if (turns > 1)
+        {
+            _queue.Enqueue((person, turns - 1));
+        }
+        // If turns == 1, do not re-enqueue
+
+        return person;
     }
 
-    public override string ToString()
-    {
-        return _people.ToString();
-    }
+    public bool IsEmpty() => _queue.Count == 0;
+
+    public int Length => _queue.Count;
 }
